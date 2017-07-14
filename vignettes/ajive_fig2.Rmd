@@ -24,8 +24,7 @@ library(GGally)
 
 
 ```{r, fig.height=4, fig.width=8}
-toy_data <- sample_toy_data(n=200, dx=100, dy=500)
-blocks <- lapply(toy_data, function(x) x[['obs']])
+blocks <- sample_toy_data(n=200, dx=100, dy=500)
 
 data_blocks_heatmap(blocks)
 ```

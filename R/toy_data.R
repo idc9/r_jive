@@ -8,16 +8,17 @@
 #' @param n Integer. Number of observations. Must be divisible by 20.
 #' @param dx Integer. Dimension of X block. Must be divisible by 2.
 #' @param dy Integer. Dimension of Y block. Must be divisible by 10.
+#' @param only_observations Boolean. Whether or not to include the true decomposition.
 #'
 #' @return A list of length 2 with the sampled data.
 #'     Each list contains: obs, joint, individual, and noise.
 #'
 #' @examples
-#' data = sample_toy_data()
-#' X_individual = data[[1]][['individual']]
+#' blocks <- sample_toy_data()
+#' X1 = blocks[[1]]
 #' @importFrom stats rnorm
 #' @export
-sample_toy_data <- function(n=200, dx=100, dy=500){
+sample_toy_data <- function(n=200, dx=100, dy=500, only_observations=TRUE){
 
     # for exact AJIVE figure 2: n=100, dx= 100, dy=10000
 
@@ -62,6 +63,21 @@ sample_toy_data <- function(n=200, dx=100, dy=500){
 
     Y_obs <- Y_joint + Y_indiv + Y_noise
 
-    list('1' = list('obs'=X_obs, 'joint' = X_joint, 'individual' = X_indiv, 'noise' = X_noise),
-         '2' = list('obs'=Y_obs, 'joint' = Y_joint, 'individual' = Y_indiv, 'noise' = Y_noise))
+    if(only_observations){
+        output <-  list('1'=X_obs, '2'=Y_obs)
+    } else{
+        output <- list()
+        output[['obs']] <- list('1'=X_obs, '2'=Y_obs)
+        output[['decomp']] <- list('1'=list('joint'=list('full'=X_joint),
+                                            'individual'=list('full'=X_joint),
+                                            'noise'=X_noise),
+                                   '2'=list('joint'=list('full'=Y_joint),
+                                            'individual'=list('full'=Y_joint),
+                                            'noise'=Y_noise))
+
+        # list('1' = list('obs'=X_obs, 'joint' = X_joint, 'individual' = X_indiv, 'noise' = X_noise),
+        #     '2' = list('obs'=Y_obs, 'joint' = Y_joint, 'individual' = Y_indiv, 'noise' = Y_noise))
+
+    }
+    output
 }

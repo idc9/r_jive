@@ -23,7 +23,7 @@ Heatmap of a single data matrix.
 }
 \examples{
 data <- sample_toy_data()
-Y_obs <- data[[2]][['obs']]
+Y_obs <- data[[2]]
 data_heatmap(Y_obs)
 
 }

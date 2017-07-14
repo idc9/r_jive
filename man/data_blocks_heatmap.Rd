@@ -17,8 +17,7 @@ Heatmaps of several data blocks.
 \examples{
 library(ggplot2)
 library(cowplot)
-data = sample_toy_data()
-blocks <- lapply(data, function(x) x[['obs']])
+blocks <- sample_toy_data()
 data_blocks_heatmap(blocks)
 
 }

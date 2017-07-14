@@ -9,7 +9,7 @@
 #'
 #' @examples
 #' data <- sample_toy_data()
-#' Y_obs <- data[[2]][['obs']]
+#' Y_obs <- data[[2]]
 #' data_heatmap(Y_obs)
 #'
 #' @import ggplot2
@@ -56,8 +56,7 @@ data_heatmap <- function(data, show_color_bar=TRUE, title='', xlab='', ylab=''){
 #' @examples
 #' library(ggplot2)
 #' library(cowplot)
-#' data = sample_toy_data()
-#' blocks <- lapply(data, function(x) x[['obs']])
+#' blocks <- sample_toy_data()
 #' data_blocks_heatmap(blocks)
 #'
 #' @export
@@ -79,41 +78,35 @@ data_blocks_heatmap <- function(blocks, show_color_bar=TRUE){
 }
 
 #' Heatmaps of JIVE decomposition of several blocks.
-#'
-#' @param block_decompositions List containing the K JIVE decomposition lists.
-#'
-#' @examples
-#' data <- sample_toy_data()
-#' library(cowplot)
-#' data_blocks_heatmap(data)
+#' @param blocks List. The observed data blocks.
+#' @param jive_decomposition List containing the JIVE decompositions.
 #'
 #' @export
-decomposition_heatmaps <- function(block_decompositions){
-    # plots a heatmap of the given jive decomposotion for each data block
+decomposition_heatmaps <- function(blocks, jive_decomposition){
 
     if (!requireNamespace("cowplot", quietly = TRUE)) {
         stop("The package 'cowplot' is needed for this function to work. Please install it.",
              call. = FALSE)
     }
 
-    K <- length(block_decompositions)
+    K <- length(blocks)
 
     heatmap_list <- list()
     for(k in 1:K){
 
-        heatmap_list[[k]] <- data_heatmap(block_decompositions[[k]][['obs']],
+        heatmap_list[[k]] <- data_heatmap(blocks[[k]],
                                           ylab=ifelse(k==1, 'observations', ''),
                                           show_color_bar=FALSE)
 
-        heatmap_list[[K + k]] <- data_heatmap(block_decompositions[[k]][['joint']],
+        heatmap_list[[K + k]] <- data_heatmap(jive_decomposition[[k]][['joint']][['full']],
                                               ylab=ifelse(k==1, 'joint', ''),
                                               show_color_bar=FALSE)
 
-        heatmap_list[[2*K + k]] <- data_heatmap(block_decompositions[[k]][['individual']],
+        heatmap_list[[2*K + k]] <- data_heatmap(jive_decomposition[[k]][['individual']][['full']],
                                                 ylab=ifelse(k==1, 'individual', ''),
                                                 show_color_bar=FALSE)
 
-        heatmap_list[[3*K + k]] <- data_heatmap(block_decompositions[[k]][['noise']],
+        heatmap_list[[3*K + k]] <- data_heatmap(jive_decomposition[[k]][['noise']],
                                                 ylab=ifelse(k==1, 'noise', ''),
                                                 show_color_bar=FALSE)
     }

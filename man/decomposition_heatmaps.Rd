@@ -4,17 +4,13 @@
 \alias{decomposition_heatmaps}
 \title{Heatmaps of JIVE decomposition of several blocks.}
 \usage{
-decomposition_heatmaps(block_decompositions)
+decomposition_heatmaps(blocks, jive_decomposition)
 }
 \arguments{
-\item{block_decompositions}{List containing the K JIVE decomposition lists.}
+\item{blocks}{List. The observed data blocks.}
+
+\item{jive_decomposition}{List containing the JIVE decompositions.}
 }
 \description{
 Heatmaps of JIVE decomposition of several blocks.
-}
-\examples{
-data <- sample_toy_data()
-library(cowplot)
-data_blocks_heatmap(data)
-
 }

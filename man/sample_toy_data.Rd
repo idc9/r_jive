@@ -4,7 +4,7 @@
 \alias{sample_toy_data}
 \title{Samples toy two block JIVE data.}
 \usage{
-sample_toy_data(n = 200, dx = 100, dy = 500)
+sample_toy_data(n = 200, dx = 100, dy = 500, only_observations = TRUE)
 }
 \arguments{
 \item{n}{Integer. Number of observations. Must be divisible by 20.}
@@ -12,6 +12,8 @@ sample_toy_data(n = 200, dx = 100, dy = 500)
 \item{dx}{Integer. Dimension of X block. Must be divisible by 2.}
 
 \item{dy}{Integer. Dimension of Y block. Must be divisible by 10.}
+
+\item{only_observations}{Boolean. Whether or not to include the true decomposition.}
 }
 \value{
 A list of length 2 with the sampled data.
@@ -24,6 +26,6 @@ A list of length 2 with the sampled data.
 Note AJIVE figure 2 uses n=100, dx=100 and dy=10000.
 }
 \examples{
-data = sample_toy_data()
-X_individual = data[[1]][['individual']]
+blocks <- sample_toy_data()
+X1 = blocks[[1]]
 }

@@ -5,9 +5,8 @@ test_that("The JIVE decomposition is self consistent",{
 
     # sample test data
     K <- 2
-    data <- sample_toy_data(n=200, dx=100, dy=500)
+    blocks <- sample_toy_data(n=200, dx=100, dy=500)
 
-    blocks <- lapply(data, function(x) x[['obs']])
     initial_signal_ranks <- c(2, 2)
     jive_decomp <- ajive(blocks, initial_signal_ranks, full=TRUE)
 

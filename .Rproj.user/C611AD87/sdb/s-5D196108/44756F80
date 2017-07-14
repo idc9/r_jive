@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "#' Scree plot\n#'\n#' @param singular_values Numeric. The singluar values.\n#' @param title String. The title of the plot.\n#'\n#' @examples\n#' X <- matrix(rnorm(n=10*20), nrow=20, ncol=10) + matrix(1, nrow=20, ncol=10)\n#' singluar_values <- svd(X)[['d']]\n#' scree_plot(singluar_values)\n#'\n#' @export\nscree_plot <- function(singular_values, title=''){\n\n    if (!requireNamespace(\"ggplot2\", quietly = TRUE)) {\n        stop(\"The package 'ggplot2' is needed for this function to work. Please install it.\",\n             call. = FALSE)\n    }\n\n    index <- 1:length(singular_values)\n    ggplot(as.data.frame(x=cbind(index, singular_values)),\n           aes(x=index, y=singular_values)) +\n        geom_point() +\n        geom_line() +\n        labs(y='singluar value', x='index', title=title)\n}\n\n\n#' Shows the scree plot for each data block.\n#'\n#' @param blocks The data blocks.\n#'\n#' @export\nscree_plot_blocks <- function(blocks){\n    plot_blocks_grid(blocks, plot_fun = function(X, title) scree_plot(get_svd(X)[['d']], title))\n}\n\n\n#' Makes a plot for each block in a hotizontal grid.\n#'\n#' @param blocks List.\n#' @param plot_fun Function. A plotting function that takes a sigle data matrix and makes a plot\n#' @param ... Additional arguments to be passed to plot_fun\nplot_blocks_grid <- function(blocks, plot_fun, ...){\n\n    if (!requireNamespace(\"cowplot\", quietly = TRUE)) {\n        stop(\"The package 'cowplot' is needed for this function to work. Please install it.\",\n             call. = FALSE)\n    }\n\n    plotslist <- list()\n    for(k in 1:length(blocks)){\n        plotslist[[k]] <- plot_fun(blocks[[k]], title=paste0('block ', k), ...)\n    }\n    cowplot::plot_grid(plotlist=plotslist)\n}\n",
+    "created" : 1500059902969.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "544959625",
+    "id" : "44756F80",
+    "lastKnownWriteTime" : 1500063299,
+    "last_content_update" : 1500063299771,
+    "path" : "~/Dropbox/Research/jive/R/ajive/R/viz.R",
+    "project_path" : "R/viz.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

@@ -1,0 +1,101 @@
+---
+title: "AJIVE figure 2"
+author: "Iain Carmichael"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+```{r}
+
+library(ajive)
+
+# for visualization
+library(dplyr)
+library(ggplot2)
+library(GGally)
+```
+
+# Sample toy data
+
+
+```{r, fig.height=4, fig.width=8}
+toy_data <- sample_toy_data(n=200, dx=100, dy=500)
+blocks <- lapply(toy_data, function(x) x[['obs']])
+
+data_blocks_heatmap(blocks)
+```
+
+First decide on the initial signal ranks.
+```{r, fig.height=4, fig.width=8}
+scree_plot_blocks(blocks)
+```
+
+Using the above scree plots we set the initial signal rank equal to 2 for both blocks.
+```{r}
+initial_signal_ranks <- c(2, 2)
+```
+
+Now we are ready to compute the JIVE decomposition
+```{r, cache=TRUE}
+jive_decomp <- ajive(blocks, initial_signal_ranks)
+```
+
+# Visualizing the results
+
+```{r}
+
+joint_scores <- jive_decomp[['joint_scores']]
+
+as_tibble(joint_scores) %>% 
+    rename(joint_scores = V1) %>% 
+    ggplot() + 
+    geom_histogram(aes(x=joint_scores))
+```
+
+
+```{r}
+scores_block1 <- as_tibble(x=cbind(jive_decomp[[1]][['joint']][['u']],
+                                   jive_decomp[[1]][['individual']][['u']])) %>% 
+                    rename(joint=V1, indiv=V2)
+                    
+             
+ggplot(scores_block1) + 
+    geom_point(aes(x=indiv, y=joint))
+```
+
+
+```{r}
+ggplot(scores_block1)+
+    geom_histogram(aes(x=indiv))
+
+ggplot(scores_block1)+
+    geom_histogram(aes(x=joint))
+```
+
+
+```{r}
+pca <- lapply(blocks, function(x) svd(x))
+```
+
+```{r}
+pca_scores_block1 <- as_tibble(pca[[1]][['u']])[ , 1:2] %>% 
+    rename(PC1=V1, PC2=V2)
+
+GGally::ggpairs(pca_scores_block1)
+```
+
+```{r}
+GGally::ggpairs(scores_block1,
+                upper='blank',
+                 diag=list(continuous='barDiag'))
+```
+
+
+
+
+

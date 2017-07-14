@@ -1,0 +1,25 @@
+Package: ajive
+Type: Package
+Title: Angle Based Joint and Individual Variation Explained
+Version: 0.1.0
+Authors@R: person("Iain", "Carmichael", email = "idc9@cornell.edu",
+    role = c("aut", "cre"))
+Description: Angle Based Joint and Individual Variation Explained (AJIVE) is a
+    dimensionality reduction algorithm for multiple data blocks (multiple data
+    matrices with the same set of observations, but distinct variables).
+    AJIVE  finds joint modes of variation that are common to all data blocks as
+    well as individual modes of variation that are specific to each block.
+    TODO: add more.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Suggests: knitr,
+    rmarkdown,
+    testthat,
+    cowplot,
+    reshape2,
+    GGally,
+    dplyr
+VignetteBuilder: knitr
+RoxygenNote: 6.0.1
+Imports: ggplot2

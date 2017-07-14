@@ -1,4 +1,0 @@
-"0","pca <- get_svd(blocks)
-"
-"2","Error in is.finite(x) : default method not implemented for type 'list'
-"

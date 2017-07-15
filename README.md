@@ -34,7 +34,7 @@ blocks <- sample_toy_data(n=200, dx=100, dy=500)
 data_blocks_heatmap(blocks, show_color_bar=FALSE)
 ```
 
-![](README-unnamed-chunk-3-1.png)
+![](man/figures/README-unnamed-chunk-3-1.png)
 
 After selecting the initial signal ranks we can compute the AJIVE decomposition using the `ajive` function.
 
@@ -49,4 +49,4 @@ The heatmap below shows that AJIVE separates the joint and inidividual signals f
 decomposition_heatmaps(blocks, jive_decomposition)
 ```
 
-![](README-unnamed-chunk-5-1.png)
+![](man/figures/README-unnamed-chunk-5-1.png)

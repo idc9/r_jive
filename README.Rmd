@@ -8,8 +8,7 @@ output: github_document
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.path = "man/figures/README-"
-)
+  fig.path = "man/figures/README-")
 ```
 ajive: Angle based Joint and Individual Variation Explained
 ---------------
@@ -48,7 +47,7 @@ jive_decomposition <- ajive(blocks, initial_signal_ranks)
 ```
 
 
-The heatmap below shows that AJIVE separates the joint and inidividual signals for this toy data set.
+The heatmap below shows that AJIVE separates the joint and individual signals for this toy data set.
 ```{r, fig.width=8, fig.height=16}
 decomposition_heatmaps(blocks, jive_decomposition)
 ```

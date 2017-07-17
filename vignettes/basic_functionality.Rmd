@@ -1,0 +1,100 @@
+---
+title: "AJIVE basic usage"
+author: "Iain Carmichael"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+This vignette covers the basic functionality of the `ajive` package.
+
+```{r}
+library(ajive)
+```
+
+# Sample toy data
+
+
+```{r, fig.height=4, fig.width=8}
+blocks <- sample_toy_data(n=200, dx=100, dy=500)
+```
+
+First decide on the initial signal ranks.
+```{r, fig.height=4, fig.width=8}
+scree_plot_blocks(blocks)
+```
+
+Using the above scree plots we set the initial signal rank equal to 2 for both blocks.
+```{r}
+initial_signal_ranks <- c(2, 2)
+```
+
+Now we are ready to compute the JIVE decomposition
+```{r, cache=TRUE}
+ajive_output <- ajive(blocks, initial_signal_ranks)
+```
+
+
+
+# accessing AJIVE output
+
+You can access a number of the possible quantities of interest with the following functions
+
+- `get_block_full`
+- `get_common_normalized_scores`
+- `get_block_scores`
+- `get_block_loadings`
+- `get_joint_rank`
+- `get_individual_rank`
+
+The user can alwasy access the AJIVE output directly from `ajive_output` which is just a list.
+
+## Full matrix representation
+
+The user can access the full JIVE decomposition matrices with `get_block_full` i.e.
+```{r}
+k <- 1
+J <- get_block_full(ajive_output, k, type='joint')
+I <- get_block_full(ajive_output, k, type='individual')
+E <- get_block_full(ajive_output, k, type='noise')
+
+# check X = J + I + E
+norm(blocks[[k]] - (J + I + E))
+```
+
+## Block Specific Scores
+
+```{r}
+bss_1 <- get_block_scores(ajive_output, k, type='joint', normalized=FALSE)
+
+```
+
+
+```{r}
+normalized_bss_1 <- get_block_scores(ajive_output, k, type='joint', normalized=TRUE)
+
+```
+
+
+## Common Normalized Scores
+
+```{r}
+cns <- get_common_normalized_scores(ajive_output)
+```
+
+
+## Individual Normalized Scores
+
+```{r}
+ins_1 <- get_block_scores(ajive_output, k, type='individual', normalized=TRUE)
+```
+
+## Individual loadings
+```{r}
+indiv_loadings_1 <- get_block_loadings(ajive_output, k, type='individual')
+```
+
+

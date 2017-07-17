@@ -31,8 +31,7 @@ The foo functions ...
 }
 
 \examples{
-data <- sample_toy_data(n=200, dx=100, dy=500)
-blocks <- lapply(data, function(x) x[['obs']])
+blocks <- sample_toy_data(n=200, dx=100, dy=500)
 initial_signal_ranks <- c(2, 2)
 jive_decomp <- ajive(blocks, initial_signal_ranks)
 

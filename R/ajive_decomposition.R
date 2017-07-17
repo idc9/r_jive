@@ -9,8 +9,7 @@
 #' @return The JIVE decomposition.
 #'
 #' @examples
-#' data <- sample_toy_data(n=200, dx=100, dy=500)
-#' blocks <- lapply(data, function(x) x[['obs']])
+#' blocks <- sample_toy_data(n=200, dx=100, dy=500)
 #' initial_signal_ranks <- c(2, 2)
 #' jive_decomp <- ajive(blocks, initial_signal_ranks)
 #'
@@ -23,6 +22,19 @@
 ajive <- function(blocks, initial_signal_ranks, full=TRUE){
 
     K <- length(blocks)
+
+    if(K < 2){
+        stop('ajive expects at least two data matrices.')
+    }
+
+    if(sum(sapply(blocks,function(X) any(is.na(X)))) > 0){
+        stop('Some of the blocks has missing data -- ajive expects full data matrices.')
+    }
+
+    # TODO: should we give the option to center the data?
+    # if(center){
+    #     blocks <- lapply(blocks,function(X) scale(X, center=T, scale=FALSE))
+    # }
 
     # step 1: initial signal space extraction --------------------------------
     # initial estimate of signal space with SVD

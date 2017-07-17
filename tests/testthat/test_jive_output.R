@@ -1,6 +1,11 @@
 context('tests basic ajive output')
 
 
+test_that("preprocessing works",{
+    # TODO: add tests for various exceptions e.g. one data block, centering, etc
+
+})
+
 test_that("The JIVE decomposition is self consistent",{
 
     # sample test data

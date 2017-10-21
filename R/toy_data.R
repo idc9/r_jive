@@ -52,9 +52,9 @@ sample_toy_data <- function(n=200, dx=100, dy=500, only_observations=TRUE){
 
     Y_indiv <- cbind(rbind(matrix(1, nrow = n/5, ncol = dy/2),
                            matrix(-1, nrow = n/5, ncol = dy/2),
-                           matrix(-1, nrow = n/5, ncol = dy/2),
+                           matrix(0, nrow = n/5, ncol = dy/2),
                            matrix(1, nrow = n/5, ncol = dy/2),
-                           matrix(1, nrow = n/5, ncol = dy/2)),
+                           matrix(-1, nrow = n/5, ncol = dy/2)),
                      rbind(matrix(1, nrow = n/4, ncol = dy/2),
                            matrix(-1, nrow = n/2, ncol = dy/2),
                            matrix(1, nrow = n/4, ncol = dy/2)))

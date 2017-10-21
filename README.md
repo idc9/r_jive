@@ -51,6 +51,8 @@ The heatmap below shows that AJIVE separates the joint and individual signals fo
 decomposition_heatmaps(blocks, jive_decomposition)
 ```
 
+![](man/figures/README-unnamed-chunk-5-1.png)
+
 Using notation from Section 3 of the [AJIVE paper](https://arxiv.org/pdf/1704.02060.pdf) (where *u* means scores and *v* means loadings) we can get the jive data out as follows
 ``` r
 # common normalized scores
@@ -69,8 +71,6 @@ jive_decomposition[[1]][['joint']][['v']]
 jive_decomposition[[2]][['individual']][['u']]
 ```
 
-
-![](man/figures/README-unnamed-chunk-5-1.png)
 
 Help and Support
 ================

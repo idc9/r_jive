@@ -21,5 +21,5 @@ Suggests: knitr,
     GGally,
     dplyr
 VignetteBuilder: knitr
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1
 Imports: ggplot2

@@ -16,6 +16,8 @@ library(ajive)
 
 # for visualization
 library(dplyr)
+
+# install.packages(c('cowplot', 'GGally'))
 library(ggplot2)
 library(GGally)
 ```
@@ -41,14 +43,14 @@ initial_signal_ranks <- c(2, 2)
 
 Now we are ready to compute the JIVE decomposition
 ```{r, cache=TRUE}
-jive_decomp <- ajive(blocks, initial_signal_ranks)
+jive_results <- ajive(blocks, initial_signal_ranks)
 ```
 
 # Visualizing the results
 
 ```{r}
 
-joint_scores <- jive_decomp[['joint_scores']]
+joint_scores <- jive_results[['joint_scores']]
 
 as_tibble(joint_scores) %>% 
     rename(joint_scores = V1) %>% 
@@ -58,8 +60,8 @@ as_tibble(joint_scores) %>%
 
 
 ```{r}
-scores_block1 <- as_tibble(x=cbind(jive_decomp[[1]][['joint']][['u']],
-                                   jive_decomp[[1]][['individual']][['u']])) %>% 
+scores_block1 <- as_tibble(x=cbind(jive_results$block_decomps[[1]][['joint']][['u']],
+                                   jive_results$block_decomps[[1]][['individual']][['u']])) %>% 
                     rename(joint=V1, indiv=V2)
                     
              

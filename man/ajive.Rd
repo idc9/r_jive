@@ -4,10 +4,10 @@
 \name{ajive}
 \alias{ajive}
 \alias{ajive-package}
-\alias{ajive}
 \title{ajive: Angle based Joint and Individual Variation Explained.}
 \usage{
-ajive(blocks, initial_signal_ranks, full = TRUE)
+ajive(blocks, initial_signal_ranks, full = TRUE,
+  n_wedin_samples = 1000, n_rand_dir_samples = 1000)
 }
 \arguments{
 \item{blocks}{List. A list of the data matrices.}
@@ -15,6 +15,10 @@ ajive(blocks, initial_signal_ranks, full = TRUE)
 \item{initial_signal_ranks}{Vector. The initial signal rank estimates.}
 
 \item{full}{Boolean. Whether or not to store the full J, I, E matrices or just their SVDs (set to FALSE to save memory).}
+
+\item{n_wedin_samples}{Integer. Number of wedin bound samples to draw for each data matrix.}
+
+\item{n_rand_dir_samples}{Integer. Number of random direction bound samples to draw.}
 }
 \value{
 The JIVE decomposition.

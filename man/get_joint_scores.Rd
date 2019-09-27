@@ -4,7 +4,8 @@
 \alias{get_joint_scores}
 \title{Computes the joint scores.}
 \usage{
-get_joint_scores(blocks, block_svd, initial_signal_ranks, sv_thresholds)
+get_joint_scores(blocks, block_svd, initial_signal_ranks, sv_thresholds,
+  n_wedin_samples = 1000, n_rand_dir_samples = 1000)
 }
 \arguments{
 \item{blocks}{List. A list of the data matrices.}
@@ -14,6 +15,10 @@ get_joint_scores(blocks, block_svd, initial_signal_ranks, sv_thresholds)
 \item{initial_signal_ranks}{Numeric vector. Initial signal ranks estimates.}
 
 \item{sv_thresholds}{Numeric vector. The singular value thresholds from the initial signal rank estimates.}
+
+\item{n_wedin_samples}{Integer. Number of wedin bound samples to draw for each data matrix.}
+
+\item{n_rand_dir_samples}{Integer. Number of random direction bound samples to draw.}
 }
 \value{
 Matrix. The joint scores.

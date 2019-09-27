@@ -13,7 +13,8 @@ test_that("The JIVE decomposition is self consistent",{
     blocks <- sample_toy_data(n=200, dx=100, dy=500)
 
     initial_signal_ranks <- c(2, 2)
-    jive_decomp <- ajive(blocks, initial_signal_ranks, full=TRUE)
+    jive_results <- ajive(blocks, initial_signal_ranks, full=TRUE)
+    jive_decomp <- jive_results$block_decomps
 
     # Check SVDs
     for(k in 1:K){
@@ -48,7 +49,7 @@ test_that("The JIVE decomposition is self consistent",{
     # check projections
     for(k in 1:K){
 
-        U <- jive_decomp[['joint_scores']]
+        U <- jive_results[['joint_scores']]
         X <- blocks[[k]]
         J <- jive_decomp[[k]][['joint']][['full']]
         expect_equal(U %*% t(U) %*% X, J,

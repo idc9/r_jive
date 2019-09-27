@@ -75,7 +75,7 @@ jive_decomposition[[2]][['individual']][['u']]
 Help and Support
 ================
 
-Additional documentation, examples and code revisions are coming soon. For questions, issues or feature requests please reach out to Iain: <iain@unc.edu>.
+Additional documentation, examples and code revisions are coming soon. For questions, issues or feature requests please reach out to Iain: <idc9@cornell.edu>.
 
 #### Documentation
 

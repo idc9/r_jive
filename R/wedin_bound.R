@@ -1,41 +1,32 @@
-#' Estimate the wedin bound for a data matrix.
 #'
-#' Esimates the wedin boud for a data matrix with the resampling procedure
+#' Esimates the wedin bound for a data matrix with the resampling procedure.
 #'
-#' See page 12 of the AJIVE paper for details.
+#' returns min(max(||E \tilde{V}||, ||E^T \tilde{U}||) / sigma_min(\widetilde{A}), 1) from equation (7)
 #'
 #' @param X Matrix. The data matrix.
 #' @param SVD List. The SVD decomposition of X.
 #' @param signal_rank Integer. The estimated signal rank of X.
 #'
-#' @return The estimated wedin bound.
-#'
-#' @importFrom stats median
-get_wedin_bound <- function(X, SVD, signal_rank){
+#' @return The the wedin bound samples.
+get_wedin_bound_samples <- function(X, SVD, signal_rank, num_samples=1000){
 
     # resample for U and V
     U_perp <- SVD[['u']][ , -(1:signal_rank)]
     U_sampled_norms <- wedin_bound_resampling(X=X,
                                               perp_basis=U_perp,
                                               right_vectors=FALSE,
-                                              num_samples=1000)
+                                              num_samples=num_samples)
 
     V_perp <- SVD[['v']][ , -(1:signal_rank)]
     V_sampled_norms <- wedin_bound_resampling(X=X,
                                               perp_basis=V_perp,
                                               right_vectors=TRUE,
-                                              num_samples=1000)
+                                              num_samples=num_samples)
 
-    # compute upper bound
-    # TODO: which way?
-    # EV_estimate <- median(V_sampled_norms)
-    # UE_estimate <- median(U_sampled_norms)
-    # wedin_bound_est - max(EV_estimate, UE_estimate)/sigma_min
     sigma_min <- SVD[['d']][signal_rank]
-    wedin_bound_samples <- mapply(function(u, v)  max(u, v)/sigma_min, U_sampled_norms, V_sampled_norms)
-    wedin_bound_est <- median(wedin_bound_samples)
+    wedin_bound_samples <- mapply(function(u, v)  min(max(u, v)/sigma_min, 1)^2, U_sampled_norms, V_sampled_norms)
 
-    wedin_bound_est
+    wedin_bound_samples
 }
 
 

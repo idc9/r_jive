@@ -5,6 +5,8 @@
 #' @param blocks List. A list of the data matrices.
 #' @param initial_signal_ranks Vector. The initial signal rank estimates.
 #' @param full Boolean. Whether or not to store the full J, I, E matrices or just their SVDs (set to FALSE to save memory).
+#' @param n_wedin_samples Integer. Number of wedin bound samples to draw for each data matrix.
+#' @param n_rand_dir_samples Integer. Number of random direction bound samples to draw.
 #'
 #' @return The JIVE decomposition.
 #'
@@ -19,7 +21,7 @@
 #' individual_rank_2 <- jive_decomp[[2]][['individual']][['rank']]
 #'
 #' @export
-ajive <- function(blocks, initial_signal_ranks, full=TRUE){
+ajive <- function(blocks, initial_signal_ranks, full=TRUE, n_wedin_samples=1000, n_rand_dir_samples=1000){
 
     K <- length(blocks)
 
@@ -53,22 +55,29 @@ ajive <- function(blocks, initial_signal_ranks, full=TRUE){
 
     # step 2: joint sapce estimation -------------------------------------------------------------
 
-    joint_scores <- get_joint_scores(blocks, block_svd, initial_signal_ranks, sv_thresholds)
+    out <- get_joint_scores(blocks, block_svd, initial_signal_ranks, sv_thresholds,
+                            n_wedin_samples=n_wedin_samples,
+                            n_rand_dir_samples=n_rand_dir_samples)
+    joint_rank_sel_results <- out$rank_sel_results
+    joint_scores <- out$joint_scores
+
     joint_rank <- dim(joint_scores)[2]
 
 
     # step 3: final decomposition -----------------------------------------------------
 
-    jive_decomposition <- list()
+    block_decomps <- list()
     for(k in 1:K){
-        jive_decomposition[[k]] <- get_final_decomposition(X=blocks[[k]],
+        block_decomps[[k]] <- get_final_decomposition(X=blocks[[k]],
                                                            joint_scores=joint_scores,
                                                            sv_threshold=sv_thresholds[k])
     }
 
+    jive_decomposition <- list(block_decomps=block_decomps)
     jive_decomposition[['joint_scores']] <- joint_scores
     jive_decomposition[['joint_rank']] <- joint_rank
 
+    jive_decomposition[['joint_rank_sel']] <- joint_rank_sel_results
     jive_decomposition
 }
 
@@ -91,11 +100,15 @@ get_sv_threshold <- function(singular_values, rank){
 #' @param block_svd List. The SVD of the data blocks.
 #' @param initial_signal_ranks Numeric vector. Initial signal ranks estimates.
 #' @param sv_thresholds Numeric vector. The singular value thresholds from the initial signal rank estimates.
+#' @param n_wedin_samples Integer. Number of wedin bound samples to draw for each data matrix.
+#' @param n_rand_dir_samples Integer. Number of random direction bound samples to draw.
 #'
 #' @return Matrix. The joint scores.
-get_joint_scores <- function(blocks, block_svd, initial_signal_ranks, sv_thresholds){
+get_joint_scores <- function(blocks, block_svd, initial_signal_ranks, sv_thresholds, n_wedin_samples=1000, n_rand_dir_samples=1000){
 
     K <- length(blocks)
+    n_obs <- dim(blocks[[1]])[1]
+
     # SVD of the signal scores matrix -----------------------------------------
     signal_scores <- list()
     for(k in 1:K){
@@ -103,22 +116,44 @@ get_joint_scores <- function(blocks, block_svd, initial_signal_ranks, sv_thresho
     }
 
     M <- do.call(cbind, signal_scores)
-    M_svd <- get_svd(M)
+    M_svd <- get_svd(M, rank=min(initial_signal_ranks))
 
 
-    # estimate joint rank with wedin bound -------------------------------------------------------------
-    wedin_bounds <- rep(NA, K)
+    # estimate joint rank with wedin bound and random direction bound -------------------------------------------------------------
+
+    # wedin bound
+    block_wedin_samples <- matrix(NA, K, n_wedin_samples)
     for(k in 1:K){
-        wedin_bounds[k] <- get_wedin_bound(X=blocks[[k]],
-                                           SVD=block_svd[[k]],
-                                           signal_rank=initial_signal_ranks[k])
+        block_wedin_samples[k, ] <- get_wedin_bound_samples(X=blocks[[k]],
+                                                            SVD=block_svd[[k]],
+                                                            signal_rank=initial_signal_ranks[k],
+                                                            num_samples=n_wedin_samples)
 
 
     }
-    joint_sv_bound <- K - sum(wedin_bounds^2)
-    joint_rank_estimate <- sum(M_svd[['d']]^2 > joint_sv_bound)
+    wedin_samples <-  K - colSums(block_wedin_samples)
+    wedin_svsq_threshold <- quantile(wedin_samples, .05)
+
+
+
+    # rand dir bound
+    rand_dir_samples <- get_random_direction_bound(n_obs=n_obs, dims=initial_signal_ranks, num_samples=n_rand_dir_samples)
+    rand_dir_svsq_threshold <- quantile(rand_dir_samples, .95)
+
+    overall_threshold <- max(wedin_svsq_threshold, rand_dir_svsq_threshold)
+    joint_rank_estimate <- sum(M_svd[['d']]^2 > overall_threshold)
+
+    # output all results
+    rank_sel_results = list(wedin=list(block_wedin_samples=block_wedin_samples,
+                                       wedin_samples=wedin_samples,
+                                       wedin_svsq_threshold=wedin_svsq_threshold),
+                            rand_dir=list(rand_dir_samples=rand_dir_samples,
+                                          rand_dir_svsq_threshold=rand_dir_svsq_threshold),
+                            overall_threshold=overall_threshold,
+                            joint_rank_estimate=joint_rank_estimate)
 
     # estimate joint score space ------------------------------------
+
 
     joint_scores <- M_svd[['u']][ , 1:joint_rank_estimate, drop=FALSE]
 
@@ -145,7 +180,7 @@ get_joint_scores <- function(blocks, block_svd, initial_signal_ranks, sv_thresho
     joint_rank <- length(to_keep)
     joint_scores <- joint_scores[ , to_keep, drop=FALSE]
 
-    joint_scores
+    list(joint_scores=joint_scores, rank_sel_results=rank_sel_results)
 }
 
 #' Computes the final JIVE decomposition.

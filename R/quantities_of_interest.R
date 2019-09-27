@@ -16,9 +16,9 @@ get_block_full <- function(ajive_output, k, type){
     }
 
     if(type  == 'noise'){
-        ajive_output[[k]][[type]]
+        ajive_output$block_decomps[[k]][[type]]
     } else{
-        ajive_output[[k]][[type]][['full']]
+        ajive_output$block_decomps[[k]][[type]][['full']]
     }
 
 }
@@ -59,10 +59,10 @@ get_block_scores <- function(ajive_output, k, type, normalized){
         stop('type must be: joint or individual')
     }
 
-    scores <- ajive_output[[k]][[type]][['u']]
+    scores <- ajive_output$block_decomps[[k]][[type]][['u']]
 
     if(!normalized){
-        D <- diag(ajive_output[[k]][[type]][['d']],
+        D <- diag(ajive_output$block_decomps[[k]][[type]][['d']],
                   ncol=dim(scores)[2])
 
         scores <- scores %*% D
@@ -83,7 +83,7 @@ get_block_loadings <- function(ajive_output, k, type){
         stop('type must be: joint or individual')
     }
 
-    ajive_output[[k]][[type]][['v']]
+    ajive_output$block_decomps[[k]][[type]][['v']]
 }
 
 
@@ -94,7 +94,7 @@ get_block_loadings <- function(ajive_output, k, type){
 #'
 #' @export
 get_joint_rank <- function(ajive_output){
-    ajive_output[[1]][['joint']][['rank']]
+    ajive_output$block_decomps[[1]][['joint']][['rank']]
 }
 
 
@@ -105,6 +105,6 @@ get_joint_rank <- function(ajive_output){
 #'
 #' @export
 get_individual_rank <- function(ajive_output, k){
-    ajive_output[[k]][['individual']][['rank']]
+    ajive_output$block_decomps[[k]][['individual']][['rank']]
 }
 

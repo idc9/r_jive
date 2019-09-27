@@ -44,37 +44,37 @@ data_blocks_heatmap(blocks, show_color_bar=FALSE)
 
 After selecting the initial signal ranks we can compute the AJIVE decomposition using the `ajive` function.
 ```{r}
-initial_signal_ranks <- c(2, 2) # set by looking at scree plots
-jive_decomposition <- ajive(blocks, initial_signal_ranks)
+initial_signal_ranks <- c(2, 3) # set by looking at scree plots
+jive_results <- ajive(blocks, initial_signal_ranks)
 ```
 
 
 The heatmap below shows that AJIVE separates the joint and individual signals for this toy data set.
 ```{r, fig.width=8, fig.height=16}
-decomposition_heatmaps(blocks, jive_decomposition)
+decomposition_heatmaps(blocks, jive_results)
 ```
 
 
 Using notation from Section 3 of the [AJIVE paper](https://arxiv.org/pdf/1704.02060.pdf) (where *u* means scores and *v* means loadings) we can get the jive data out as follows
 ```{r}
 # common normalized scores
-jive_decomposition$joint_scores
+jive_results$joint_scores
 
 # Full matrix representation of the joint signal for the first block
-jive_decomposition[[1]][['joint']][['full']]
+jive_results$block_decomps[[1]][['joint']][['full']]
 
 # joint block specific scores for the first block
-jive_decomposition[[1]][['joint']][['u']]
+jive_results$block_decomps[[1]][['joint']][['u']]
 
 # joint block specific loadings for the first block
-jive_decomposition[[1]][['joint']][['v']]
+jive_results$block_decomps[[1]][['joint']][['v']]
 
 # individual block specific scores for the second block
-jive_decomposition[[2]][['individual']][['u']]
+jive_results$block_decomps[[2]][['individual']][['u']]
 ```
 # Help and Support
 
-Additional documentation, examples and code revisions are coming soon. For questions, issues or feature requests please reach out to Iain: iain@unc.edu. 
+Additional documentation, examples and code revisions are coming soon. For questions, issues or feature requests please reach out to Iain: idc9@cornell.edu. 
 
 #### Documentation
 

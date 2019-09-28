@@ -4,12 +4,12 @@
 \alias{decomposition_heatmaps}
 \title{Heatmaps of JIVE decomposition of several blocks.}
 \usage{
-decomposition_heatmaps(blocks, jive_decomposition)
+decomposition_heatmaps(blocks, jive_results)
 }
 \arguments{
 \item{blocks}{List. The observed data blocks.}
 
-\item{jive_decomposition}{List containing the JIVE decompositions.}
+\item{jive_results}{List containing the JIVE decompositions.}
 }
 \description{
 Heatmaps of JIVE decomposition of several blocks.

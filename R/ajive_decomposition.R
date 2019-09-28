@@ -7,7 +7,8 @@
 #' @param full Boolean. Whether or not to store the full J, I, E matrices or just their SVDs (set to FALSE to save memory).
 #' @param n_wedin_samples Integer. Number of wedin bound samples to draw for each data matrix.
 #' @param n_rand_dir_samples Integer. Number of random direction bound samples to draw.
-#'
+#' @param joint_rank Integer or NA. User specified joint_rank. If NA will be estimated from data.
+
 #' @return The JIVE decomposition.
 #'
 #' @examples
@@ -21,7 +22,7 @@
 #' individual_rank_2 <- jive_decomp[[2]][['individual']][['rank']]
 #'
 #' @export
-ajive <- function(blocks, initial_signal_ranks, full=TRUE, n_wedin_samples=1000, n_rand_dir_samples=1000){
+ajive <- function(blocks, initial_signal_ranks, full=TRUE, n_wedin_samples=1000, n_rand_dir_samples=1000, joint_rank=NA){
 
     K <- length(blocks)
 
@@ -57,7 +58,8 @@ ajive <- function(blocks, initial_signal_ranks, full=TRUE, n_wedin_samples=1000,
 
     out <- get_joint_scores(blocks, block_svd, initial_signal_ranks, sv_thresholds,
                             n_wedin_samples=n_wedin_samples,
-                            n_rand_dir_samples=n_rand_dir_samples)
+                            n_rand_dir_samples=n_rand_dir_samples,
+                            joint_rank=joint_rank)
     joint_rank_sel_results <- out$rank_sel_results
     joint_scores <- out$joint_scores
 
@@ -102,9 +104,18 @@ get_sv_threshold <- function(singular_values, rank){
 #' @param sv_thresholds Numeric vector. The singular value thresholds from the initial signal rank estimates.
 #' @param n_wedin_samples Integer. Number of wedin bound samples to draw for each data matrix.
 #' @param n_rand_dir_samples Integer. Number of random direction bound samples to draw.
+#' @param joint_rank Integer or NA. User specified joint_rank. If NA will be estimated from data.
 #'
 #' @return Matrix. The joint scores.
-get_joint_scores <- function(blocks, block_svd, initial_signal_ranks, sv_thresholds, n_wedin_samples=1000, n_rand_dir_samples=1000){
+get_joint_scores <- function(blocks, block_svd, initial_signal_ranks, sv_thresholds,
+                             n_wedin_samples=1000, n_rand_dir_samples=1000,
+                             joint_rank=NA){
+
+
+    if(is.na(n_wedin_samples) & is.na(n_rand_dir_samples) & is.na(joint_rank)){
+        stop('at least one of n_wedin_samples, n_rand_dir_samples, or joint_rank must not be NA',
+             call.=FALSE)
+    }
 
     K <- length(blocks)
     n_obs <- dim(blocks[[1]])[1]
@@ -121,36 +132,58 @@ get_joint_scores <- function(blocks, block_svd, initial_signal_ranks, sv_thresho
 
     # estimate joint rank with wedin bound and random direction bound -------------------------------------------------------------
 
-    # wedin bound
-    block_wedin_samples <- matrix(NA, K, n_wedin_samples)
-    for(k in 1:K){
-        block_wedin_samples[k, ] <- get_wedin_bound_samples(X=blocks[[k]],
-                                                            SVD=block_svd[[k]],
-                                                            signal_rank=initial_signal_ranks[k],
-                                                            num_samples=n_wedin_samples)
+    rank_sel_results  <- list()
+    rank_sel_results[['obs_svals']] <- M_svd[['d']]
+
+    if(is.na(joint_rank)){
+
+        # maybe comptue wedin bound
+        if(!is.na(n_wedin_samples)){
+
+            block_wedin_samples <- matrix(NA, K, n_wedin_samples)
+
+            for(k in 1:K){
+                block_wedin_samples[k, ] <- get_wedin_bound_samples(X=blocks[[k]],
+                                                                    SVD=block_svd[[k]],
+                                                                    signal_rank=initial_signal_ranks[k],
+                                                                    num_samples=n_wedin_samples)
+            }
+
+            wedin_samples <-  K - colSums(block_wedin_samples)
+            wedin_svsq_threshold <- quantile(wedin_samples, .05)
+
+            rank_sel_results[['wedin']] <- list(block_wedin_samples=block_wedin_samples,
+                                                wedin_samples=wedin_samples,
+                                                wedin_svsq_threshold=wedin_svsq_threshold)
+        } else{
+            wedin_svsq_threshold <- NA
+        }
+
+        # maybe compute random direction bound
+        if(!is.na(n_rand_dir_samples)){
+
+            rand_dir_samples <- get_random_direction_bound(n_obs=n_obs, dims=initial_signal_ranks, num_samples=n_rand_dir_samples)
+            rand_dir_svsq_threshold <- quantile(rand_dir_samples, .95)
+
+            rank_sel_results[['rand_dir']] <- list(rand_dir_samples=rand_dir_samples,
+                                                   rand_dir_svsq_threshold=rand_dir_svsq_threshold)
+
+        } else {
+            rand_dir_svsq_threshold <- NA
+        }
+
+        overall_sv_sq_threshold <- max(wedin_svsq_threshold, rand_dir_svsq_threshold, na.rm=TRUE)
+        joint_rank_estimate <- sum(M_svd[['d']]^2 > overall_sv_sq_threshold)
+
+        rank_sel_results[['overall_sv_sq_threshold']] <- overall_sv_sq_threshold
+        rank_sel_results[['joint_rank_estimate']] <- joint_rank_estimate
 
 
+    } else { # user provided joint rank
+        joint_rank_estimate <- joint_rank
+        rank_sel_results[['joint_rank_estimate']] <- joint_rank
     }
-    wedin_samples <-  K - colSums(block_wedin_samples)
-    wedin_svsq_threshold <- quantile(wedin_samples, .05)
 
-
-
-    # rand dir bound
-    rand_dir_samples <- get_random_direction_bound(n_obs=n_obs, dims=initial_signal_ranks, num_samples=n_rand_dir_samples)
-    rand_dir_svsq_threshold <- quantile(rand_dir_samples, .95)
-
-    overall_threshold <- max(wedin_svsq_threshold, rand_dir_svsq_threshold)
-    joint_rank_estimate <- sum(M_svd[['d']]^2 > overall_threshold)
-
-    # output all results
-    rank_sel_results = list(wedin=list(block_wedin_samples=block_wedin_samples,
-                                       wedin_samples=wedin_samples,
-                                       wedin_svsq_threshold=wedin_svsq_threshold),
-                            rand_dir=list(rand_dir_samples=rand_dir_samples,
-                                          rand_dir_svsq_threshold=rand_dir_svsq_threshold),
-                            overall_threshold=overall_threshold,
-                            joint_rank_estimate=joint_rank_estimate)
 
     # estimate joint score space ------------------------------------
 

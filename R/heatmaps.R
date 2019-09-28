@@ -79,10 +79,10 @@ data_blocks_heatmap <- function(blocks, show_color_bar=TRUE){
 
 #' Heatmaps of JIVE decomposition of several blocks.
 #' @param blocks List. The observed data blocks.
-#' @param jive_decomposition List containing the JIVE decompositions.
+#' @param jive_results List containing the JIVE decompositions.
 #'
 #' @export
-decomposition_heatmaps <- function(blocks, jive_decomposition){
+decomposition_heatmaps <- function(blocks, jive_results){
 
     if (!requireNamespace("cowplot", quietly = TRUE)) {
         stop("The package 'cowplot' is needed for this function to work. Please install it.",
@@ -98,15 +98,15 @@ decomposition_heatmaps <- function(blocks, jive_decomposition){
                                           ylab=ifelse(k==1, 'observations', ''),
                                           show_color_bar=FALSE)
 
-        heatmap_list[[K + k]] <- data_heatmap(jive_decomposition[[k]][['joint']][['full']],
+        heatmap_list[[K + k]] <- data_heatmap(jive_results$block_decomps[[k]][['joint']][['full']],
                                               ylab=ifelse(k==1, 'joint', ''),
                                               show_color_bar=FALSE)
 
-        heatmap_list[[2*K + k]] <- data_heatmap(jive_decomposition[[k]][['individual']][['full']],
+        heatmap_list[[2*K + k]] <- data_heatmap(jive_results$block_decomps[[k]][['individual']][['full']],
                                                 ylab=ifelse(k==1, 'individual', ''),
                                                 show_color_bar=FALSE)
 
-        heatmap_list[[3*K + k]] <- data_heatmap(jive_decomposition[[k]][['noise']],
+        heatmap_list[[3*K + k]] <- data_heatmap(jive_results$block_decomps[[k]][['noise']],
                                                 ylab=ifelse(k==1, 'noise', ''),
                                                 show_color_bar=FALSE)
     }

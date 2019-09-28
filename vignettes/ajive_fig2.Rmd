@@ -43,7 +43,8 @@ initial_signal_ranks <- c(2, 2)
 
 Now we are ready to compute the JIVE decomposition
 ```{r, cache=TRUE}
-jive_results <- ajive(blocks, initial_signal_ranks)
+jive_results <- ajive(blocks, initial_signal_ranks,
+                      n_wedin_samples = 100, n_rand_dir_samples = 100)
 ```
 
 # Visualizing the results

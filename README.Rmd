@@ -37,6 +37,8 @@ devtools::install_github("idc9/r_jive")
 Consider the following two block toy example: the first block has 200 observations (rows) and 100 variables; the second block has the same set of 200 observations and 500 variables (similar to Figure 2 of the AJIVE paper).
 ```{r, fig.width=8, fig.height=4}
 library(ajive)
+
+# sample a toy dataset with true joint rank of 1
 blocks <- sample_toy_data(n=200, dx=100, dy=500)
 
 data_blocks_heatmap(blocks, show_color_bar=FALSE)
@@ -45,7 +47,11 @@ data_blocks_heatmap(blocks, show_color_bar=FALSE)
 After selecting the initial signal ranks we can compute the AJIVE decomposition using the `ajive` function.
 ```{r}
 initial_signal_ranks <- c(2, 3) # set by looking at scree plots
-jive_results <- ajive(blocks, initial_signal_ranks)
+jive_results <- ajive(blocks, initial_signal_ranks, 
+                      n_wedin_samples = 100, n_rand_dir_samples = 100)
+
+# estimated joint rank
+jive_results$joint_rank
 ```
 
 

@@ -7,7 +7,7 @@
 \title{ajive: Angle based Joint and Individual Variation Explained.}
 \usage{
 ajive(blocks, initial_signal_ranks, full = TRUE,
-  n_wedin_samples = 1000, n_rand_dir_samples = 1000)
+  n_wedin_samples = 1000, n_rand_dir_samples = 1000, joint_rank = NA)
 }
 \arguments{
 \item{blocks}{List. A list of the data matrices.}
@@ -19,6 +19,8 @@ ajive(blocks, initial_signal_ranks, full = TRUE,
 \item{n_wedin_samples}{Integer. Number of wedin bound samples to draw for each data matrix.}
 
 \item{n_rand_dir_samples}{Integer. Number of random direction bound samples to draw.}
+
+\item{joint_rank}{Integer or NA. User specified joint_rank. If NA will be estimated from data.}
 }
 \value{
 The JIVE decomposition.

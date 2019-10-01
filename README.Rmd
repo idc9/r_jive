@@ -64,19 +64,19 @@ decomposition_heatmaps(blocks, jive_results)
 Using notation from Section 3 of the [AJIVE paper](https://arxiv.org/pdf/1704.02060.pdf) (where *u* means scores and *v* means loadings) we can get the jive data out as follows
 ```{r}
 # common normalized scores
-jive_results$joint_scores
+dim(jive_results$joint_scores)
 
 # Full matrix representation of the joint signal for the first block
-jive_results$block_decomps[[1]][['joint']][['full']]
+dim(jive_results$block_decomps[[1]][['joint']][['full']])
 
 # joint block specific scores for the first block
-jive_results$block_decomps[[1]][['joint']][['u']]
+dim(jive_results$block_decomps[[1]][['joint']][['u']])
 
 # joint block specific loadings for the first block
-jive_results$block_decomps[[1]][['joint']][['v']]
+dim(jive_results$block_decomps[[1]][['joint']][['v']])
 
 # individual block specific scores for the second block
-jive_results$block_decomps[[2]][['individual']][['u']]
+dim(jive_results$block_decomps[[2]][['individual']][['u']])
 ```
 # Help and Support
 

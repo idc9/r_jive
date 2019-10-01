@@ -1,7 +1,7 @@
 #'
 #' Esimates the wedin bound for a data matrix with the resampling procedure.
 #'
-#' returns min(max(||E \tilde{V}||, ||E^T \tilde{U}||) / sigma_min(\widetilde{A}), 1) from equation (7)
+#' returns min(max(||E tilde{V}||, ||E^T tilde{U}||) / sigma_min(widetilde{A}), 1) from equation (7)
 #'
 #' @param X Matrix. The data matrix.
 #' @param SVD List. The SVD decomposition of X.

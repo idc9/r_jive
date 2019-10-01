@@ -17,5 +17,5 @@ get_wedin_bound_samples(X, SVD, signal_rank, num_samples = 1000)
 The the wedin bound samples.
 }
 \description{
-returns min(max(||E \tilde{V}||, ||E^T \tilde{U}||) / sigma_min(\widetilde{A}), 1) from equation (7)
+returns min(max(||E tilde{V}||, ||E^T tilde{U}||) / sigma_min(widetilde{A}), 1) from equation (7)
 }

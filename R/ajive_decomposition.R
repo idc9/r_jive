@@ -63,7 +63,7 @@ ajive <- function(blocks, initial_signal_ranks, full=TRUE, n_wedin_samples=1000,
     joint_rank_sel_results <- out$rank_sel_results
     joint_scores <- out$joint_scores
 
-    joint_rank <- dim(joint_scores)[2]
+    joint_rank <- out[['rank_sel_results']][['joint_rank_estimate']] # dim(joint_scores)[2]
 
 
     # step 3: final decomposition -----------------------------------------------------
@@ -71,8 +71,8 @@ ajive <- function(blocks, initial_signal_ranks, full=TRUE, n_wedin_samples=1000,
     block_decomps <- list()
     for(k in 1:K){
         block_decomps[[k]] <- get_final_decomposition(X=blocks[[k]],
-                                                           joint_scores=joint_scores,
-                                                           sv_threshold=sv_thresholds[k])
+                                                      joint_scores=joint_scores,
+                                                      sv_threshold=sv_thresholds[k])
     }
 
     jive_decomposition <- list(block_decomps=block_decomps)
@@ -187,31 +187,35 @@ get_joint_scores <- function(blocks, block_svd, initial_signal_ranks, sv_thresho
 
     # estimate joint score space ------------------------------------
 
+    if(joint_rank_estimate >= 1){
+        joint_scores <- M_svd[['u']][ , 1:joint_rank_estimate, drop=FALSE]
 
-    joint_scores <- M_svd[['u']][ , 1:joint_rank_estimate, drop=FALSE]
+        # reconsider joint score space ------------------------------------
+        # remove columns of joint_scores that have a
+        # trivial projection from one of the data matrices
 
-    # reconsider joint score space ------------------------------------
-    # remove columns of joint_scores that have a
-    # trivial projection from one of the data matrices
+        to_remove <- c()
+        for(k in 1:K){
+            for(j in 1:joint_rank_estimate){
 
-    to_remove <- c()
-    for(k in 1:K){
-        for(j in 1:joint_rank_estimate){
+                score <- t(blocks[[k]]) %*% joint_scores[ , j]
+                sv <- norm(score)
 
-            score <- t(blocks[[k]]) %*% joint_scores[ , j]
-            sv <- norm(score)
-
-            if(sv < sv_thresholds[[k]]){
-                print(paste('removing column', j))
-                to_remove <- c(to_remove, j)
-                break
+                if(sv < sv_thresholds[[k]]){
+                    print(paste('removing column', j))
+                    to_remove <- c(to_remove, j)
+                    break
+                }
             }
-        }
 
+        }
+        to_keep <- setdiff(1:joint_rank_estimate, to_remove)
+        joint_rank <- length(to_keep)
+        joint_scores <- joint_scores[ , to_keep, drop=FALSE]
+    } else {
+        joint_scores <- NA
     }
-    to_keep <- setdiff(1:joint_rank_estimate, to_remove)
-    joint_rank <- length(to_keep)
-    joint_scores <- joint_scores[ , to_keep, drop=FALSE]
+
 
     list(joint_scores=joint_scores, rank_sel_results=rank_sel_results)
 }
@@ -250,14 +254,17 @@ get_final_decomposition <- function(X, joint_scores, sv_threshold, full=TRUE){
 #' @param full Boolean. Do we compute the full J, I matrices or just the SVD (set to FALSE to save memory).
 get_individual_decomposition <- function(X, joint_scores, sv_threshold, full=TRUE){
 
-    X_orthog <- (diag(dim(X)[1]) - joint_scores %*% t(joint_scores)) %*% X
+    if(is.na(joint_scores)){
+        indiv_decomposition <- get_svd(X)
+    } else{
+        X_orthog <- (diag(dim(X)[1]) - joint_scores %*% t(joint_scores)) %*% X
+        indiv_decomposition <- get_svd(X_orthog)
+    }
 
-    indiv_decomposition <- get_svd(X_orthog)
 
     indiv_rank <- sum(indiv_decomposition[['d']] > sv_threshold)
 
-    indiv_decomposition <- truncate_svd(decomposition=indiv_decomposition,
-                                        rank=indiv_rank)
+    indiv_decomposition <- truncate_svd(decomposition=indiv_decomposition, rank=indiv_rank)
 
     if(full){
         indiv_decomposition[['full']] <- svd_reconstruction(indiv_decomposition)
@@ -277,6 +284,10 @@ get_individual_decomposition <- function(X, joint_scores, sv_threshold, full=TRU
 #' @param full Boolean. Do we compute the full J, I matrices or just the SVD (set to FALSE to save memory).
 get_joint_decomposition <- function(X, joint_scores, full=TRUE){
 
+    if(is.na(joint_scores)){
+        joint_decomposition <- list(full= NA, rank=0, u=NA, d=NA, v=NA)
+        return(joint_decomposition)
+    }
     joint_rank <- dim(joint_scores)[2]
     J <-  joint_scores %*% t(joint_scores) %*% X
 

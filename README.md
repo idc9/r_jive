@@ -122,7 +122,7 @@ We welcome contributions to make this a stronger package: data examples,
 bug fixes, spelling errors, new features, etc.
 <!-- TODO: add a more CONTRIBUTING file with more detail -->
 
-#### Citation
+# Citation
 
-A [Journal of Statistical Software](https://www.jstatsoft.org/index)
-paper is hopefully coming soon…
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4091755.svg)](https://doi.org/10.5281/zenodo.4091755)
+
